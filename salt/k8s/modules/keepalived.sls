@@ -15,6 +15,14 @@ keepalived-install:
     - require:
       - file: k8s-repo
 
+keepalived-health-config:
+  file.managed:
+    - name: /etc/keepalived/haproxy_health_check.sh
+    - source: salt://k8s/templates/keepalived/haproxy_health_check.sh
+    - user: root
+    - group: root
+    - mode: 755
+
 keepalived-config:
   file.managed:
     - name: /etc/keepalived/keepalived.conf
@@ -24,9 +32,9 @@ keepalived-config:
     - mode: 644
     - template: jinja
     - defaults:
-        MASTER_IP: {{ pillar['MASTER_IP'] }}
+        MASTER_VIP: {{ pillar['MASTER_VIP'] }}
     - require:
-      pkg: keepalived-install
+      - pkg: keepalived-install
 
 keepalived-service:
   service.running:
